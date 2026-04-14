@@ -1,0 +1,16 @@
+{
+  "name": "ai-host-plugin",
+  "description": "Uploads and manages files for static websites using AI IKUMI HOST",
+  "version": "1.0.0",
+  "author": {
+    "name": "Jesus Rodriguez"
+  },
+  "userConfig": {
+    "api_key": {
+      "title": "AIHost API Key",
+      "description": "Your AIHost API key (starts with aih_live_)",
+      "type": "string",
+      "sensitive": true
+    }
+  }
+}

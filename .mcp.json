@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "ai-host": {
+      "command": "node",
+      "args": ["${CLAUDE_PLUGIN_ROOT}/mcp/dist/index.mjs"],
+      "env": {
+        "AIHOST_API_KEY": "${user_config.api_key}"
+      }
+    }
+  }
+}
