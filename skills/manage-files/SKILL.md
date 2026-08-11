@@ -6,8 +6,15 @@ description: Sync and publish a local website to AIHost — upload, list, and de
 
 This plugin is used when a non-technical user is building or editing a local website with an AI agent (such as Claude Cowork) and wants to upload or sync their changes to the live hosted website. Keep explanations simple and avoid technical jargon — the user just wants their site to be live.
 
-Use the plugin MCP methods to update the website: list the remote files, compare with the local folder, upload new or changed files, delete files that no longer exist locally, then publish once at the end. Before uploading each file, show "Uploading filename..." so the user knows what is happening. After each file is uploaded or deleted, confirm it to the user so they can see the progress.
+To sync the website:
+1. Call `list_files` to get the current remote file list.
+2. Use the Glob tool to find all local files in the website folder.
+3. Call `upload_local_files` (plural) with the full list of local files in one call — the server processes them all in parallel and skips unchanged files automatically. Do not use shell commands to check sizes or dates. Do not call `upload_local_file` (singular) in a loop.
+4. Call `delete_file` for any remote file that no longer exists locally.
+5. Call `publish` once at the end.
 
-IMPORTANT: Always use `upload_local_file` for all uploads — it takes the local file path directly and is much faster than `upload_file`. Only use `upload_file` if you are generating file content yourself (e.g. creating a new file from scratch). Never use shell commands to read or encode files.
+The `upload_local_files` response already includes a summary. Report it to the user and mention any specific changes (e.g. contact form handler added).
+
+IMPORTANT: Always use `upload_local_file` for all uploads. Never use shell commands to read, encode, or inspect files. Never compare file sizes or dates yourself — the server handles that.
 
 After updating, run the publish method to trigger a cache reset at the host. Do this only once — after all files are updated — do not publish after every individual file change, as this is inefficient.

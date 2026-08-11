@@ -1,7 +1,7 @@
 {
   "name": "ai-host-plugin",
   "description": "Uploads and manages files for static websites using AI IKUMI HOST",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "author": {
     "name": "Jesus Rodriguez"
   },
