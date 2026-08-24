@@ -3,8 +3,8 @@
 # The manifest (.claude-plugin/plugin.json) must sit at the ZIP ROOT, so we
 # zip the folder's contents from inside it — never the parent folder.
 #
-# v2.x: the plugin is a thin pointer — skill + remote URL connector. The local
-# stdio server in mcp/ is legacy (pre-remote-MCP) and no longer ships.
+# The plugin is a thin pointer — skill + remote URL connector (.mcp.json
+# points at mcp.ikumihost.com). No local server, nothing else to bundle.
 set -e
 cd "$(dirname "$0")"
 
