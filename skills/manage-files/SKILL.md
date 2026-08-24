@@ -22,6 +22,6 @@ Either way:
 4. If a `plan_sync` response lists files that exist on the website but not locally, delete each with `delete_file` only if the user removed them on purpose — ask the user if unsure.
 5. Call `publish` exactly once at the end, automatically — no extra confirmation here, since the user already agreed to publish before you started.
 
-Report the outcome to the user in plain words (what changed and that the site is now live), and mention anything the server flagged (e.g. a contact form handler was added).
+Report the outcome to the user in plain words (what changed and that the site is now live), include the site's live URL so they can click straight to it, and mention anything the server flagged (e.g. a contact form handler was added).
 
 If a tool asks for authorization or returns an authentication error, tell the user to connect the IkumiHost connector (Connect button) and log in with their IkumiHost account.
