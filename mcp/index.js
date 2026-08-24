@@ -9,8 +9,15 @@ import { z } from "zod";
 import https from "https";
 import { lookup as mimeLookup } from "mime-types";
 
-const VERSION = "1.0.0";
-const API_KEY = process.env.AIHOST_API_KEY;
+const VERSION = "1.0.5";
+
+// The API key arrives one of two ways:
+//   - CLAUDE_PLUGIN_OPTION_API_KEY: exported automatically for the userConfig
+//     "api_key" value. We rely on this instead of ${user_config.api_key}
+//     substitution in .mcp.json, because that substitution makes Claude Code
+//     silently skip spawning the server (anthropics/claude-code#51573).
+//   - AIHOST_API_KEY: manual override for CLI testing with --plugin-dir.
+const API_KEY = process.env.AIHOST_API_KEY || process.env.CLAUDE_PLUGIN_OPTION_API_KEY;
 
 // --- Sync state ---
 // Stores the mtime of each local file at the time it was last successfully uploaded.
@@ -110,16 +117,16 @@ function embedContactHandler(fileBuffer, remotePath) {
   return { content: Buffer.from(updated, "utf8"), modified: true };
 }
 
-if (!API_KEY) {
-  console.error("Error: AIHOST_API_KEY environment variable is not set.");
-  process.exit(1);
-}
-
 // --- Credential management ---
 
 let credentials = null;
 
 async function apiPost(path, body = {}) {
+  // Checked lazily per call rather than at startup: the server must connect
+  // even without a key so the user gets a readable error instead of a dead server.
+  if (!API_KEY) {
+    throw new Error("API key not configured. Set your IkumiHost API key in the plugin settings, then restart the session.");
+  }
   return new Promise((resolve, reject) => {
     const url = new URL(API_BASE + path);
     const payload = JSON.stringify(body);
@@ -149,6 +156,19 @@ async function apiPost(path, body = {}) {
   });
 }
 
+// Numeric segment-by-segment comparison — string comparison breaks on
+// versions like "1.0.9" vs "1.0.10".
+function isVersionLower(a, b) {
+  const pa = String(a).split(".").map(Number);
+  const pb = String(b).split(".").map(Number);
+  for (let i = 0; i < Math.max(pa.length, pb.length); i++) {
+    const x = pa[i] ?? 0;
+    const y = pb[i] ?? 0;
+    if (x !== y) return x < y;
+  }
+  return false;
+}
+
 async function fetchCredentials() {
   const res = await apiPost("/v1/credentials");
   if (res.status === 401) throw new Error("Invalid API key.");
@@ -157,10 +177,10 @@ async function fetchCredentials() {
 
   const creds = res.body;
 
-  // Version check
-  if (VERSION < creds.minVersion) {
-    console.error(`This MCP server (v${VERSION}) is outdated. Please update to v${creds.minVersion} or later.`);
-    process.exit(1);
+  // Version check — thrown, not exited: this runs inside tool calls now,
+  // and exiting would kill the connected server without explanation.
+  if (creds.minVersion && isVersionLower(VERSION, creds.minVersion)) {
+    throw new Error(`This plugin (v${VERSION}) is outdated. Please update to v${creds.minVersion} or later.`);
   }
 
   credentials = {
@@ -483,7 +503,10 @@ server.registerTool(
       Key: key
     }));
 
-    await apiPost("/v1/invalidation", { path: `/${sanitizePath(path)}` });
+    const res = await apiPost("/v1/invalidation", { path: `/${sanitizePath(path)}` });
+    if (res.status !== 200) {
+      return { content: [{ type: "text", text: `Deleted: ${path}, but cache invalidation failed: ${res.body.error ?? `HTTP ${res.status}`}` }] };
+    }
 
     return { content: [{ type: "text", text: `Deleted: ${path}` }] };
   }
@@ -496,15 +519,20 @@ server.registerTool(
     description: "Make your website go live. Call this once after all files are uploaded."
   },
   async () => {
-    await apiPost("/v1/invalidation");
+    const res = await apiPost("/v1/invalidation");
+    if (res.status !== 200) {
+      throw new Error(`Publish failed: ${res.body.error ?? `HTTP ${res.status}`}`);
+    }
     return { content: [{ type: "text", text: "Published. Your website is live." }] };
   }
 );
 
 // --- Start ---
+// No eager credential fetch: connect first so that a missing key or a
+// transient API failure surfaces as a readable per-tool error instead of
+// the server never connecting. getCredentials() fetches on first use.
 
 await loadSyncState();
-await fetchCredentials();
 
 const transport = new StdioServerTransport();
 await server.connect(transport);

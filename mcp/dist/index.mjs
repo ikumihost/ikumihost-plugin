@@ -62764,8 +62764,8 @@ import { createHash } from "crypto";
 import { readFile, stat, writeFile, mkdir } from "fs/promises";
 var import_mime_types = __toESM(require_mime_types(), 1);
 import https from "https";
-var VERSION = "1.0.0";
-var API_KEY = process.env.AIHOST_API_KEY;
+var VERSION = "1.0.5";
+var API_KEY = process.env.AIHOST_API_KEY || process.env.CLAUDE_PLUGIN_OPTION_API_KEY;
 var SYNC_STATE_PATH = process.env.CLAUDE_PLUGIN_DATA ? `${process.env.CLAUDE_PLUGIN_DATA}/sync-state.json` : null;
 var syncState = {};
 async function loadSyncState() {
@@ -62815,12 +62815,11 @@ function embedContactHandler(fileBuffer, remotePath) {
 </body>`) : html + CONTACT_SCRIPT_TAG;
   return { content: Buffer.from(updated, "utf8"), modified: true };
 }
-if (!API_KEY) {
-  console.error("Error: AIHOST_API_KEY environment variable is not set.");
-  process.exit(1);
-}
 var credentials = null;
 async function apiPost(path, body = {}) {
+  if (!API_KEY) {
+    throw new Error("API key not configured. Set your IkumiHost API key in the plugin settings, then restart the session.");
+  }
   return new Promise((resolve, reject) => {
     const url = new URL(API_BASE + path);
     const payload2 = JSON.stringify(body);
@@ -62849,15 +62848,24 @@ async function apiPost(path, body = {}) {
     req.end();
   });
 }
+function isVersionLower(a5, b5) {
+  const pa = String(a5).split(".").map(Number);
+  const pb = String(b5).split(".").map(Number);
+  for (let i5 = 0; i5 < Math.max(pa.length, pb.length); i5++) {
+    const x5 = pa[i5] ?? 0;
+    const y2 = pb[i5] ?? 0;
+    if (x5 !== y2) return x5 < y2;
+  }
+  return false;
+}
 async function fetchCredentials() {
   const res = await apiPost("/v1/credentials");
   if (res.status === 401) throw new Error("Invalid API key.");
   if (res.status === 403) throw new Error(`Account access denied: ${res.body.error}`);
   if (res.status !== 200) throw new Error(`Credentials request failed: ${res.body.error}`);
   const creds = res.body;
-  if (VERSION < creds.minVersion) {
-    console.error(`This MCP server (v${VERSION}) is outdated. Please update to v${creds.minVersion} or later.`);
-    process.exit(1);
+  if (creds.minVersion && isVersionLower(VERSION, creds.minVersion)) {
+    throw new Error(`This plugin (v${VERSION}) is outdated. Please update to v${creds.minVersion} or later.`);
   }
   credentials = {
     ...creds,
@@ -63091,7 +63099,10 @@ server.registerTool(
       Bucket: creds.bucket,
       Key: key
     }));
-    await apiPost("/v1/invalidation", { path: `/${sanitizePath(path)}` });
+    const res = await apiPost("/v1/invalidation", { path: `/${sanitizePath(path)}` });
+    if (res.status !== 200) {
+      return { content: [{ type: "text", text: `Deleted: ${path}, but cache invalidation failed: ${res.body.error ?? `HTTP ${res.status}`}` }] };
+    }
     return { content: [{ type: "text", text: `Deleted: ${path}` }] };
   }
 );
@@ -63101,12 +63112,14 @@ server.registerTool(
     description: "Make your website go live. Call this once after all files are uploaded."
   },
   async () => {
-    await apiPost("/v1/invalidation");
+    const res = await apiPost("/v1/invalidation");
+    if (res.status !== 200) {
+      throw new Error(`Publish failed: ${res.body.error ?? `HTTP ${res.status}`}`);
+    }
     return { content: [{ type: "text", text: "Published. Your website is live." }] };
   }
 );
 await loadSyncState();
-await fetchCredentials();
 var transport = new StdioServerTransport();
 await server.connect(transport);
 /*! Bundled license information:

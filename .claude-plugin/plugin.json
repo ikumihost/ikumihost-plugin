@@ -1,14 +1,8 @@
 {
   "name": "ikumihost-plugin",
-  "description": "Uploads and manages files for static websites using AI IKUMI HOST",
-  "version": "1.0.3",
+  "description": "Publish and manage static websites on IKUMI HOST",
+  "version": "2.0.3",
   "author": {
     "name": "Jesus Rodriguez"
-  },
-  "userConfig": {
-    "api_key": {
-      "description": "Your AIHost API key (starts with aih_live_)",
-      "sensitive": true
-    }
   }
 }
