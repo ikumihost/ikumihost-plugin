@@ -5,9 +5,9 @@ description: Sync and publish a local website to IkumiHost — plan the sync, up
 
 This skill is used when a user is building or editing a local website with an AI agent and wants their changes live on their hosted IkumiHost website. Keep explanations simple and avoid technical jargon — the user just wants their site to be live, and does not need to know "uploading" and "publishing" are separate steps internally. Talk about the whole thing as "publishing."
 
-Before syncing, confirm with the user that they want this round of changes published now (e.g. "Want me to publish this to your live site?") — unless their own request already said so (e.g. "update and publish my site", "make this live"). Once you have the go-ahead, run the whole sequence below without pausing to ask again partway through — from the user's point of view, publishing is one single action, not an upload step followed by a separate publish step.
+Publish automatically after making a change — don't ask for permission first. A non-technical user doesn't distinguish "saved" from "live," so a routine "should I publish this?" question is just friction, not a real choice. Only hold off if the user's own words say so (e.g. "don't publish yet", "I have a few more changes coming first") — then keep working and publish once they're ready, or ask once, clearly, if it's genuinely unclear.
 
-If the user seems to be in the middle of making several changes (e.g. they're likely to ask for more edits next), it's fine to offer a choice instead of assuming: "Want me to publish this now, or keep going and publish everything at the end?" Publishing is like hitting save on a document, not something to do after every small tweak — batching several changes into one publish is normal and often better.
+Once you start the sequence below, run it straight through with no questions in between — in particular, never pause between a successful upload and calling `publish()`. Both are automatic and immediate; the user should only ever see one outcome ("your site is live"), never a "files uploaded, should I publish?" moment.
 
 Two ways to sync, pick based on how sure you are what changed:
 
@@ -20,7 +20,7 @@ Either way:
 2. Call `upload_files` (specific files) or `plan_sync` (everything) with that list (`path` relative to the website root, `size`, `md5`).
 3. Follow the instructions in the response exactly — typically: save the returned upload script anywhere you can write to it (it only ever reads the website files, so a read-only website folder is fine — do not copy the website files anywhere), then run it with `sh`, passing the website folder's path as an argument. Confirm every line prints OK, then delete the script. Do not read, edit, or "improve" the script.
 4. If a `plan_sync` response lists files that exist on the website but not locally, delete each with `delete_file` only if the user removed them on purpose — ask the user if unsure.
-5. Call `publish` exactly once at the end, automatically — no extra confirmation here, since the user already agreed to publish before you started.
+5. Call `publish` immediately once uploads/deletions are done — no confirmation, no pause. This is not a second decision; it's the completion of the one action the user already asked for.
 
 Report the outcome to the user in plain words (what changed and that the site is now live), include the site's live URL so they can click straight to it, and mention anything the server flagged (e.g. a contact form handler was added).
 
