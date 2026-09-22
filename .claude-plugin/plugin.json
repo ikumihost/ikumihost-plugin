@@ -1,7 +1,7 @@
 {
   "name": "ikumihost-plugin",
   "description": "Publish and manage static websites on IKUMI HOST",
-  "version": "2.0.5",
+  "version": "2.0.6",
   "author": {
     "name": "Jesus Rodriguez"
   }

@@ -22,6 +22,8 @@ Either way:
 4. If a `plan_sync` response lists files that exist on the website but not locally, delete each with `delete_file` only if the user removed them on purpose — ask the user if unsure.
 5. Call `publish` immediately once uploads/deletions are done — no confirmation, no pause. This is not a second decision; it's the completion of the one action the user already asked for.
 
+If the site has (or the user wants) a contact form, no backend or third-party form service is needed — write a plain `<form method="post">` with named, labelled inputs, no custom `action` and no submit-handling JavaScript. IkumiHost wires it up automatically on publish to email the account owner; a submit handler that fakes "message sent" without actually sending anything, a `mailto:` link, or a call to some invented `/api/contact` endpoint would either be redundant or simply not work on this platform.
+
 Report the outcome to the user in plain words (what changed and that the site is now live), include the site's live URL so they can click straight to it, and mention anything the server flagged (e.g. a contact form handler was added).
 
 If a tool asks for authorization or returns an authentication error, tell the user to connect the IkumiHost connector (Connect button) and log in with their IkumiHost account.
