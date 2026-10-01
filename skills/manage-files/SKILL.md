@@ -9,12 +9,15 @@ Publish automatically after making a change — don't ask for permission first. 
 
 Once you start the sequence below, run it straight through with no questions in between — in particular, never pause between a successful upload and calling `publish()`. Both are automatic and immediate; the user should only ever see one outcome ("your site is live"), never a "files uploaded, should I publish?" moment.
 
-Two ways to sync, pick based on how sure you are what changed:
+Three ways to make a change live, pick based on the size of the change:
 
-- **You already know exactly which files changed** (you just edited them yourself in this conversation): call `upload_files` with just those files. Skips checking the rest of the site — much faster, especially on a site with many images or other large files that haven't changed.
+- **A small change to ONE file already on the website** (fixing a typo, changing a line or a label): call `edit_file` directly with the exact old text and the new text — no MD5s, no script, no upload step. Call `get_file` first if you don't already know the file's exact current text, since `edit_file` needs an exact match. Never re-create and re-upload a whole file just to change a few lines — `edit_file` is far cheaper and faster. Pass `publish: true` to make it live in the same call.
+- **You already know exactly which files changed** (you just edited several of them yourself in this conversation, or are uploading new files): call `upload_files` with just those files. Skips checking the rest of the site — much faster, especially on a site with many images or other large files that haven't changed.
 - **You're not sure, or this is the first sync of the session**: call `plan_sync` with every local file. It checks the whole site and also catches files that were deleted locally and need removing remotely.
 
-Either way:
+If you used `edit_file` earlier in this conversation, make sure your local copy of that file reflects the edit before calling `plan_sync` — otherwise plan_sync sees your stale local copy as "changed" and will overwrite the live edit. Either apply the same change to your local file, or fetch the current version with `get_file` first.
+
+For `upload_files`/`plan_sync`:
 
 1. For each file you're sending, get its size in bytes and the lowercase hex MD5 of its content (`md5 -q <file>` on macOS, `md5sum <file>` on Linux — one shell call for several files is fine).
 2. Call `upload_files` (specific files) or `plan_sync` (everything) with that list (`path` relative to the website root, `size`, `md5`).
