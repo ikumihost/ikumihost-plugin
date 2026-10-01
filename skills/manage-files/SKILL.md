@@ -27,6 +27,8 @@ For `upload_files`/`plan_sync`:
 
 If the site has (or the user wants) a contact form, no backend or third-party form service is needed — write a plain `<form method="post">` with named, labelled inputs, no custom `action` and no submit-handling JavaScript. IkumiHost wires it up automatically on publish to email the account owner; a submit handler that fakes "message sent" without actually sending anything, a `mailto:` link, or a call to some invented `/api/contact` endpoint would either be redundant or simply not work on this platform.
 
+CSS and JS files are cached in visitors' browsers for a full year — much longer than HTML (60 seconds). Publishing a changed stylesheet or script does NOT make returning visitors see it: their browser already has the old file and has no reason to ask for it again just because the site was republished. Whenever you change the CONTENT of an existing CSS or JS file, also change its URL everywhere it's referenced (e.g. bump `style.css` to `style.css?v=2`, or increment an existing version number) so browsers treat it as a new file and fetch it fresh. Do this consistently on every page that links to it — a page you miss keeps serving the old file to returning visitors even though the new one is live.
+
 Report the outcome to the user in plain words (what changed and that the site is now live), include the site's live URL so they can click straight to it, and mention anything the server flagged (e.g. a contact form handler was added).
 
 If a tool asks for authorization or returns an authentication error, tell the user to connect the IkumiHost connector (Connect button) and log in with their IkumiHost account.
