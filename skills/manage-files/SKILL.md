@@ -20,7 +20,7 @@ If you used `edit_file` earlier in this conversation, make sure your local copy 
 For `upload_files`/`plan_sync`:
 
 1. For each file you're sending, get its size in bytes and the lowercase hex MD5 of its content (`md5 -q <file>` on macOS, `md5sum <file>` on Linux — one shell call for several files is fine).
-2. Call `upload_files` (specific files) or `plan_sync` (everything) with that list (`path` relative to the website root, `size`, `md5`).
+2. Call `upload_files` (specific files) or `plan_sync` (everything) with that list (`path` relative to the website root, `size`, `md5`). Put EVERY file from one change into a single call — each call produces its own upload script, so splitting a change across several calls means retyping several scripts. Never re-create a whole file just to change a few lines; use `edit_file` for that.
 3. Follow the instructions in the response exactly — typically: save the returned upload script anywhere you can write to it (it only ever reads the website files, so a read-only website folder is fine — do not copy the website files anywhere), then run it with `sh`, passing the website folder's path as an argument. Confirm every line prints OK, then delete the script. Do not read, edit, or "improve" the script.
 4. If a `plan_sync` response lists files that exist on the website but not locally, delete each with `delete_file` only if the user removed them on purpose — ask the user if unsure.
 5. Call `publish` immediately once uploads/deletions are done — no confirmation, no pause. This is not a second decision; it's the completion of the one action the user already asked for.
