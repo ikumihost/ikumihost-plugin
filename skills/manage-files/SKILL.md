@@ -17,6 +17,8 @@ Three ways to make a change live, pick based on the size of the change:
 
 If you used `edit_file` earlier in this conversation, make sure your local copy of that file reflects the edit before calling `plan_sync` — otherwise plan_sync sees your stale local copy as "changed" and will overwrite the live edit. Either apply the same change to your local file, or fetch the current version with `get_file` first.
 
+Before uploading a photo, resize it to the size it will be shown at on the page — about 1600px wide for a full-width photo, about 1000px for a gallery thumbnail, keeping the aspect ratio — and save it as a JPEG at good quality (the default is fine). Don't upload original camera or phone files as they are: they are often 5–10 MB, and most of that is never used on a web page. Use whatever image tool is available (e.g. Python with Pillow, or `sips` on macOS).
+
 For `upload_files`/`plan_sync`:
 
 1. For each file you're sending, get its size in bytes and the lowercase hex MD5 of its content (`md5 -q <file>` on macOS, `md5sum <file>` on Linux — one shell call for several files is fine).
