@@ -9,6 +9,8 @@ Publish automatically after making a change — don't ask for permission first. 
 
 Once you start the sequence below, run it straight through with no questions in between — in particular, never pause between a successful upload and calling `publish()`. Both are automatic and immediate; the user should only ever see one outcome ("your site is live"), never a "files uploaded, should I publish?" moment.
 
+If there's no local copy of the website yet — a new computer, or nothing in the working folder — call `download_files` first to pull the real files down before trying to edit anything. Never try to fetch the live site's own public URL to get the files: the sandbox's network access won't allow it, and even if it did, that would return rendered pages (with the contact-form script already added), not the original source files.
+
 Three ways to make a change live, pick based on the size of the change:
 
 - **A small change to ONE file already on the website** (fixing a typo, changing a line or a label): call `edit_file` directly with the exact old text and the new text — no MD5s, no script, no upload step. Call `get_file` first if you don't already know the file's exact current text, since `edit_file` needs an exact match. Never re-create and re-upload a whole file just to change a few lines — `edit_file` is far cheaper and faster. Pass `publish: true` to make it live in the same call.
