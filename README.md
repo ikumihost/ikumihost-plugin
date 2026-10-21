@@ -21,9 +21,9 @@ Other tools list, read, edit (exact text replacement), download and delete files
 
 Contact forms: on publish, any page with a `<form>` gets a small script from `api.ikumihost.com` that emails submissions to your account address.
 
-## Using it in Cowork
+## Allow network access in Claude
 
-Cowork blocks network access by default. Under **Settings → Capabilities → Allow network egress → Additional allowed domains**, add:
+When Claude works with your files, its workspace blocks network access by default, and uploads need it. Under **Settings → Capabilities → Allow network egress → Additional allowed domains**, add:
 
 - `ai-labhost-1.s3.eu-west-3.amazonaws.com`
 - `mcp.ikumihost.com`
