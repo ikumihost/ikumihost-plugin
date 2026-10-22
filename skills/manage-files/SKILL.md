@@ -13,7 +13,7 @@ If there's no local copy of the website yet — a new computer, or nothing in th
 
 Three ways to make a change live, pick based on the size of the change:
 
-- **A small change to ONE file already on the website** (fixing a typo, changing a line or a label): call `edit_file` directly with the exact old text and the new text — no MD5s, no script, no upload step. Call `get_file` first if you don't already know the file's exact current text, since `edit_file` needs an exact match. Never re-create and re-upload a whole file just to change a few lines — `edit_file` is far cheaper and faster. Pass `publish: true` to make it live in the same call.
+- **A small change to ONE file already on the website** (fixing a typo, changing a line or a label): call `edit_file` directly with the exact old text and the new text — no MD5s, no script, no upload step. Call `get_file` first if you don't already know the file's exact current text, since `edit_file` needs an exact match. Never re-create and re-upload a whole file just to change a few lines — `edit_file` is far cheaper and faster. Pass `publish: true` by default so the edit goes live in the same call; the same goes for `delete_file` and `delete_files`.
 - **You already know exactly which files changed** (you just edited several of them yourself in this conversation, or are uploading new files): call `upload_files` with just those files. Skips checking the rest of the site — much faster, especially on a site with many images or other large files that haven't changed.
 - **You're not sure, or this is the first sync of the session**: call `plan_sync` with every local file. It checks the whole site and also catches files that were deleted locally and need removing remotely.
 
