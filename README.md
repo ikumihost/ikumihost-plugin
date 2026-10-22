@@ -25,8 +25,9 @@ Contact forms: on publish, any page with a `<form>` gets a small script from `ap
 
 When Claude works with your files, its workspace blocks network access by default, and uploads need it. Under **Settings → Capabilities → Allow network egress → Additional allowed domains**, add:
 
-- `ai-labhost-1.s3.eu-west-3.amazonaws.com`
-- `mcp.ikumihost.com`
+- `*.ikumihost.com`
+
+This covers `mcp.ikumihost.com` (the connector and one-time upload scripts) and `files.ikumihost.com` (where your files are sent and fetched). If you prefer, you can add just those two hosts instead.
 
 ## Support
 
