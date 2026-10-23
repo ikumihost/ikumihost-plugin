@@ -17,7 +17,7 @@ The assistant only ever sends your server **metadata** (file paths, sizes and MD
 2. Running that command fetches a short upload script from `mcp.ikumihost.com`, generated just for that request, and runs it in your website folder. The script can be fetched once and expires after 15 minutes. It only uploads the listed files, using presigned links that are valid for one object each, to IkumiHost's storage bucket.
 3. The assistant then calls `publish`, which refreshes the CDN and returns your live address.
 
-Other tools list, read, edit (exact text replacement), download and delete files in your own site only. Your files can never reach another customer's site, and nobody else's files are reachable from yours.
+Other tools list, read, edit (exact text replacement), download, delete (to a trash where files stay restorable for 7 days) and restore files in your own site only. Your files can never reach another customer's site, and nobody else's files are reachable from yours.
 
 Contact forms: on publish, any page with a `<form>` gets a small script from `api.ikumihost.com` that emails submissions to your account address.
 
