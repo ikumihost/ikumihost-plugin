@@ -1,13 +1,13 @@
 ---
 name: manage-files
-description: Sync and publish a local website to IkumiHost — plan the sync, upload changed files, then publish once at the end.
+description: Sync and publish a local website to IkumiHost — one sync command uploads the changed files and publishes the site.
 ---
 
 This skill is used when a user is building or editing a local website with an AI agent and wants their changes live on their hosted IkumiHost website. Keep explanations simple and avoid technical jargon — the user just wants their site to be live, and does not need to know "uploading" and "publishing" are separate steps internally. Talk about the whole thing as "publishing."
 
-Publish automatically after making a change — don't ask for permission first. A non-technical user doesn't distinguish "saved" from "live," so a routine "should I publish this?" question is just friction, not a real choice. Only hold off if the user's own words say so (e.g. "don't publish yet", "I have a few more changes coming first") — then keep working and publish once they're ready, or ask once, clearly, if it's genuinely unclear.
+Publish automatically after making a change — don't ask for permission first. A non-technical user doesn't distinguish "saved" from "live," so a routine "should I publish this?" question is just friction, not a real choice. Only hold off if the user's own words say so (e.g. "don't publish yet", "I have a few more changes coming first") — then keep working on the local files and don't sync until they're ready (a sync publishes), or ask once, clearly, if it's genuinely unclear.
 
-Once you start the sequence below, run it straight through with no questions in between — in particular, never pause between a successful upload and calling `publish()`. Both are automatic and immediate; the user should only ever see one outcome ("your site is live"), never a "files uploaded, should I publish?" moment.
+The upload command publishes the site by itself as soon as every upload has succeeded, and prints the live address. Once you start the sequence below, run it straight through with no questions in between; the user should only ever see one outcome ("your site is live"), never a "files uploaded, should I publish?" moment.
 
 If there's no local copy of the website yet — a new computer, or nothing in the working folder — call `download_files` first to pull the real files down before trying to edit anything. Never try to fetch the live site's own public URL to get the files: the sandbox's network access won't allow it, and even if it did, that would return rendered pages (with the contact-form script already added), not the original source files.
 
@@ -36,8 +36,9 @@ For `upload_files`:
 
 Then, for either:
 
-1. If the output lists files that exist on the website but not locally, move each to the trash with `trash_file` (or `trash_files` for several) only if the user removed them on purpose — ask the user if unsure.
-2. Call `publish` immediately once uploads/deletions are done — no confirmation, no pause. This is not a second decision; it's the completion of the one action the user already asked for.
+1. When the output ends with the site's live address, the change is published — there's nothing more to call.
+2. If the output lists files that exist on the website but not locally, move each to the trash with `trash_file` (or `trash_files` for several) with `publish: true`, only if the user removed them on purpose — ask the user if unsure.
+3. Call `publish` yourself only when the output says the files are uploaded but not live yet, or when you used the `inline: true` fallback — immediately, with no confirmation. It's the completion of the one action the user already asked for, not a second decision.
 
 If the site has (or the user wants) a contact form, no backend or third-party form service is needed — write a plain `<form method="post">` with named, labelled inputs, no custom `action` and no submit-handling JavaScript. IkumiHost wires it up automatically on publish to email the account owner; a submit handler that fakes "message sent" without actually sending anything, a `mailto:` link, or a call to some invented `/api/contact` endpoint would either be redundant or simply not work on this platform.
 
