@@ -15,7 +15,7 @@ Three ways to make a change live, pick based on the size of the change:
 
 - **A small change to ONE file already on the website** (fixing a typo, changing a line or a label): call `edit_file` directly with the exact old text and the new text — no MD5s, no script, no upload step. Call `get_file` first if you don't already know the file's exact current text, since `edit_file` needs an exact match. Never re-create and re-upload a whole file just to change a few lines — `edit_file` is far cheaper and faster. The edit goes live in the same call.
 - **You already know exactly which files changed** (you just edited several of them yourself in this conversation, or are uploading new files): call `upload_files` with just those files. Skips checking the rest of the site — much faster, especially on a site with many images or other large files that haven't changed.
-- **You're not sure, or this is the first sync of the session**: call `plan_sync` with every local file. It checks the whole site and also catches files that were deleted locally and need removing remotely.
+- **You're not sure, or this is the first sync of the session**: call `plan_sync` with no file list. The command it returns lists the website folder itself, uploads only what changed, and also catches files that were deleted locally and need removing remotely. Keep the website folder for the website only: every file in it (except hidden ones) is uploaded.
 
 If you used `edit_file` earlier in this conversation, make sure your local copy of that file reflects the edit before calling `plan_sync` — otherwise plan_sync sees your stale local copy as "changed" and will overwrite the live edit. Either apply the same change to your local file, or fetch the current version with `get_file` first.
 
@@ -23,13 +23,21 @@ To delete a file the user no longer wants, call `trash_file` (or `trash_files` f
 
 Before uploading a photo, resize it to the size it will be shown at on the page — about 1600px wide for a full-width photo, about 1000px for a gallery thumbnail, keeping the aspect ratio — and save it as a JPEG at good quality (the default is fine). Don't upload original camera or phone files as they are: they are often 5–10 MB, and most of that is never used on a web page. Use whatever image tool is available (e.g. Python with Pillow, or `sips` on macOS).
 
-For `upload_files`/`plan_sync`:
+For `plan_sync`:
+
+1. Call `plan_sync` with no `files` (add `prefix` to sync only one subfolder). Don't list files or compute checksums yourself — the command does that.
+2. Run the single command it returns, with the website folder's absolute path. Do not read, edit, or "improve" the command. Confirm every upload line prints OK; the output ends with the next step. If it fails because the sandbox can't reach the upload host, follow the instructions in the response.
+
+For `upload_files`:
 
 1. For each file you're sending, get its size in bytes and the lowercase hex MD5 of its content (`md5 -q <file>` on macOS, `md5sum <file>` on Linux — one shell call for several files is fine).
-2. Call `upload_files` (specific files) or `plan_sync` (everything) with that list (`path` relative to the website root, `size`, `md5`). Put EVERY file from one change into a single call — each call produces its own upload command, so splitting a change across several calls means more work. Never re-create a whole file just to change a few lines; use `edit_file` for that.
-3. Follow the instructions in the response exactly — typically: run the single command it gives you. It downloads the upload script and runs it, so there's nothing to save or retype. Confirm every line prints OK. Do not read, edit, or "improve" the command. If it fails because the sandbox can't reach the upload host, follow the instructions in the response.
-4. If a `plan_sync` response lists files that exist on the website but not locally, move each to the trash with `trash_file` (or `trash_files` for several) only if the user removed them on purpose — ask the user if unsure.
-5. Call `publish` immediately once uploads/deletions are done — no confirmation, no pause. This is not a second decision; it's the completion of the one action the user already asked for.
+2. Call `upload_files` with that list (`path` relative to the website root, `size`, `md5`). Put EVERY file from one change into a single call — each call produces its own upload command, so splitting a change across several calls means more work. Never re-create a whole file just to change a few lines; use `edit_file` for that.
+3. Run the single command it returns, following the instructions in the response exactly. It downloads the upload script and runs it, so there's nothing to save or retype. Confirm every line prints OK. Do not read, edit, or "improve" the command. If it fails because the sandbox can't reach the upload host, follow the instructions in the response.
+
+Then, for either:
+
+1. If the output lists files that exist on the website but not locally, move each to the trash with `trash_file` (or `trash_files` for several) only if the user removed them on purpose — ask the user if unsure.
+2. Call `publish` immediately once uploads/deletions are done — no confirmation, no pause. This is not a second decision; it's the completion of the one action the user already asked for.
 
 If the site has (or the user wants) a contact form, no backend or third-party form service is needed — write a plain `<form method="post">` with named, labelled inputs, no custom `action` and no submit-handling JavaScript. IkumiHost wires it up automatically on publish to email the account owner; a submit handler that fakes "message sent" without actually sending anything, a `mailto:` link, or a call to some invented `/api/contact` endpoint would either be redundant or simply not work on this platform.
 
