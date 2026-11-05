@@ -1,7 +1,7 @@
 {
   "name": "ikumihost-plugin",
   "description": "Publish and manage static websites on IKUMI HOST",
-  "version": "2.0.26",
+  "version": "2.0.27",
   "license": "MIT",
   "privacyPolicyUrl": "https://ikumihost.com/privacy",
   "author": {

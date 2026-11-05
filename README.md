@@ -23,9 +23,11 @@ Contact forms: on publish, any page with a `<form>` gets a small script from `ap
 
 ## Allow network access in Claude
 
-When Claude works with your files, its workspace blocks network access by default, and uploads need it. Under **Settings → Capabilities → Allow network egress → Additional allowed domains**, add:
+When Claude works with your files, its workspace blocks network access by default, and uploads need it. Allow this one address in Claude's settings:
 
 - `*.ikumihost.com`
+
+The current steps (Claude renames these settings from time to time) are at [ikumihost.com/help/allow-internet](https://ikumihost.com/help/allow-internet).
 
 This covers `mcp.ikumihost.com` (the connector and one-time upload scripts) and `files.ikumihost.com` (where your files are sent and fetched). If you prefer, you can add just those two hosts instead.
 
