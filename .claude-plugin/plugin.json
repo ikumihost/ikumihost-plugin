@@ -1,9 +1,14 @@
 {
   "name": "ikumihost-plugin",
-  "description": "Publish and manage static websites on IKUMI HOST",
-  "version": "2.0.29",
+  "displayName": "IkumiHost",
+  "description": "Publish and update your website by asking Claude. Hosting, SSL, a global CDN and your own web address, handled for you.",
+  "version": "2.0.30",
   "license": "MIT",
+  "homepage": "https://ikumihost.com",
+  "documentationUrl": "https://ikumihost.com/help/connect-claude",
+  "supportUrl": "https://ikumihost.com/contact",
   "privacyPolicyUrl": "https://ikumihost.com/privacy",
+  "termsOfServiceUrl": "https://ikumihost.com/terms",
   "author": {
     "name": "Jesus Rodriguez"
   }
