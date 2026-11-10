@@ -15,7 +15,7 @@ The assistant only ever sends your server **metadata** (file paths, sizes and MD
 
 1. The server compares your files against what is already live and replies with a single shell command.
 2. Running that command fetches a short upload script from `mcp.ikumihost.com`, generated just for that request, and runs it in your website folder. The script can be fetched once and expires after 15 minutes. It only uploads the listed files, using presigned links that are valid for one object each, to IkumiHost's storage bucket.
-3. The assistant then calls `publish`, which refreshes the CDN and returns your live address.
+3. When every upload has succeeded, the script publishes the site itself: it refreshes the CDN and prints your live address.
 
 Other tools list, read, edit (exact text replacement), download, delete (to a trash where files stay restorable for 7 days) and restore files in your own site only. Your files can never reach another customer's site, and nobody else's files are reachable from yours.
 

@@ -37,7 +37,7 @@ For `upload_files`:
 Then, for either:
 
 1. When the output ends with the site's live address, the change is published — there's nothing more to call.
-2. If the output lists files that exist on the website but not locally, move each to the trash with `trash_file` (or `trash_files` for several) with `publish: true`, only if the user removed them on purpose — ask the user if unsure.
+2. If the output lists files that exist on the website but not locally, move each to the trash with `trash_file` (or `trash_files` for several; the deletion goes live in the same call), only if the user removed them on purpose — ask the user if unsure.
 3. Call `publish` yourself only when the output says the files are uploaded but not live yet, or when you used the `inline: true` fallback — immediately, with no confirmation. It's the completion of the one action the user already asked for, not a second decision.
 
 If the site has (or the user wants) a contact form, no backend or third-party form service is needed — write a plain `<form method="post">` with named, labelled inputs, no custom `action` and no submit-handling JavaScript. IkumiHost wires it up automatically on publish to email the account owner; a submit handler that fakes "message sent" without actually sending anything, a `mailto:` link, or a call to some invented `/api/contact` endpoint would either be redundant or simply not work on this platform.
